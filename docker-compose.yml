@@ -25,12 +25,12 @@ services:
       - "traefik.enable=true"
       # HTTP -> HTTPS redirection
       - "traefik.http.routers.ctf-challenge.entrypoints=http"
-      - "traefik.http.routers.ctf-challenge.rule=Host(`ctf.makhal.fr`)"
+      - "traefik.http.routers.ctf-challenge.rule=Host(`ctf-1.makhal.fr`)"
       - "traefik.http.routers.ctf-challenge.middlewares=https-redirect"
       - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
       # HTTPS configuration
       - "traefik.http.routers.ctf-challenge-secure.entrypoints=https"
-      - "traefik.http.routers.ctf-challenge-secure.rule=Host(`ctf.makhal.fr`)"
+      - "traefik.http.routers.ctf-challenge-secure.rule=Host(`ctf-1.makhal.fr`)"
       - "traefik.http.routers.ctf-challenge-secure.tls=true"
       - "traefik.http.routers.ctf-challenge-secure.tls.certresolver=cloudflare"
       # Security headers middleware
