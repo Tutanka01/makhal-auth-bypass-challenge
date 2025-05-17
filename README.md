@@ -1,14 +1,28 @@
-# Challenge CTF - Bypass d'Authentification
+# Challenge CTF - Le Système d'Authentification Abandonné
 
-Ce dépôt contient un challenge CTF simple axé sur le bypass d'authentification.
+Ce dépôt contient un challenge CTF pour débutants axé sur l'exploitation d'une faille de logique dans un système d'authentification.
+
+## Description du Challenge
+
+Vous êtes face à un "Système d'Administration Sécurisé" qui a récemment mis à jour son protocole d'authentification. Votre mission est de trouver une façon de contourner ce système pour accéder au panneau d'administration et récupérer le flag.
+
+**Difficulté**: Débutant à Intermédiaire
+
+**Catégorie**: Web - Authentification
+
+**Objectif**: Trouver une faille dans le système d'authentification qui vous permettra d'accéder au panneau d'administration sans connaître les identifiants valides.
+
+## Indices
+
+- Examinez attentivement le code source de la page
+- Les commentaires peuvent contenir des informations importantes
+- Les systèmes qui conservent d'anciennes méthodes d'authentification pour "compatibilité" sont souvent vulnérables
 
 ## Configuration et Déploiement
 
 ### Prérequis
 
 - Docker et Docker Compose installés sur votre machine
-- Traefik configuré comme reverse proxy (avec résolution DNS pour `*.makhal.fr`)
-- Un réseau Docker nommé `traefik-network`
 
 ### Installation
 
@@ -23,43 +37,40 @@ Ce dépôt contient un challenge CTF simple axé sur le bypass d'authentificatio
    docker-compose up -d
    ```
 
-4. Accédez au challenge à l'URL : https://ctf.makhal.fr
+3. Accédez au challenge à l'URL : http://localhost:8080
 
-### Sécurité
+## Solution
 
-Cette configuration inclut plusieurs mesures de sécurité (hardening) :
+Ne regardez pas cette section si vous souhaitez résoudre le challenge par vous-même !
 
-#### Docker
-- Principe du moindre privilège (drop all capabilities sauf NET_BIND_SERVICE)
-- Container en mode lecture seule (read-only)
-- Montage temporaire pour les fichiers volatils (/tmp, /var/run/apache2)
-- Option no-new-privileges pour empêcher l'escalade de privilèges
-- Montage des sources en lecture seule (ro)
-
-#### PHP/Apache
-- Paramètres PHP sécurisés (expose_php=Off, etc.)
-- En-têtes de sécurité HTTP configurés
-- Permissions de fichiers restreintes
-- Exécution en tant qu'utilisateur non-root (www-data)
-
-#### Traefik
-- Redirection HTTP vers HTTPS
-- En-têtes de sécurité (HSTS, XSS Protection, etc.)
-- Limitation de débit (rate limiting) pour prévenir les attaques par force brute
-- TLS avec Cloudflare comme résolveur de certificat
-
-## Maintenance
-
-Pour mettre à jour le challenge ou appliquer des modifications :
-
-```bash
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
-```
+<details>
+  <summary>Cliquez pour révéler la solution</summary>
+  
+  La vulnérabilité réside dans l'utilisation d'une ancienne méthode d'authentification ("legacy") qui est encore présente dans le code mais n'est pas exposée dans l'interface utilisateur.
+  
+  Pour exploiter cette vulnérabilité :
+  1. Examinez le code source de la page pour découvrir des commentaires mentionnant "legacy"
+  2. Modifiez votre requête pour inclure un paramètre `auth_method=legacy`
+  3. Utilisez le nom d'utilisateur "admin" (seule vérification effectuée par la méthode legacy)
+  
+  Exemple d'exploitation :
+  ```
+  POST /login.php HTTP/1.1
+  Host: localhost:8080
+  
+  username=admin&auth_method=legacy
+  ```
+  
+  Ou simplement modifier le formulaire dans la console du navigateur pour ajouter un champ caché :
+  ```html
+  <input type="hidden" name="auth_method" value="legacy">
+  ```
+  
+  Puis se connecter avec le nom d'utilisateur "admin" (le mot de passe peut être n'importe quoi).
+</details>
 
 ## Contenu du Challenge
 
-Ce challenge CTF se concentre sur un bypass d'authentification simple. Le code source est disponible dans le dossier `src/`.
+Ce challenge CTF se concentre sur l'exploitation d'anciennes méthodes d'authentification laissées dans le code. Le code source est disponible dans le dossier `src/`.
 
 **Note** : Ce challenge est conçu à des fins éducatives uniquement. Le code contient des vulnérabilités intentionnelles.

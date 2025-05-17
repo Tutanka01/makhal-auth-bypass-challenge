@@ -20,7 +20,7 @@ services:
     volumes:
       - ./src:/var/www/html:ro
     networks:
-      - traefik-network
+      - frontend
     labels:
       - "traefik.enable=true"
       # HTTP -> HTTPS redirection
@@ -51,5 +51,5 @@ services:
       - "traefik.http.routers.ctf-challenge-secure.service=ctf-service"
 
 networks:
-  traefik-network:
+  frontend:
     external: true
